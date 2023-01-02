@@ -5,7 +5,7 @@ cfg_if! {
         use leptos::*;
         use actix_files::{Files, NamedFile};
         use actix_web::{HttpServer, middleware::Compress, web};
-        use leptos_start::app::*;
+        use darkmode::app::*;
 
         #[actix_web::main]
         async fn main() -> std::io::Result<()> {
@@ -14,6 +14,8 @@ cfg_if! {
 
             simple_logger::init_with_level(log::Level::Debug).expect("couldn't initialize logging");
             log::info!("serving at http://{addr}");
+
+            register_server_functions();
 
             HttpServer::new(move || {
                 let leptos_options = &conf.leptos_options;

@@ -1,5 +1,5 @@
 [package]
-name = "leptos_start"
+name = "darkmode"
 version = "0.1.0"
 edition = "2021"
 
@@ -19,9 +19,14 @@ leptos_meta = { git = "https://github.com/gbj/leptos", default-features = false 
 leptos_actix = { git = "https://github.com/gbj/leptos", default-features = false, optional = true }
 leptos_router = { git = "https://github.com/gbj/leptos", default-features = false }
 log = "0.4"
+serde = "1"
 simple_logger = "4"
 wasm-bindgen = "0.2"
-web-sys = { version = "0.3", features = ["AbortController", "AbortSignal"] }
+web-sys = { version = "0.3", features = [
+  "AbortController",
+  "AbortSignal",
+  "HtmlDocument",
+] }
 
 [features]
 hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]

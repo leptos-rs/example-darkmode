@@ -1,5 +1,13 @@
+use crate::dark_mode::{DarkModeToggle, DarkModeToggleProps, ToggleDarkMode};
 use leptos::*;
 use leptos_meta::*;
+use leptos_router::*;
+
+// Helper to register all our server functions, if we're in SSR mode
+#[cfg(feature = "ssr")]
+pub fn register_server_functions() {
+    _ = ToggleDarkMode::register();
+}
 
 #[component]
 pub fn App(cx: Scope) -> impl IntoView {
@@ -13,17 +21,20 @@ pub fn App(cx: Scope) -> impl IntoView {
     view! {
         cx,
 
-        // injects a stylesheet into the document <head>
-        // id=leptos means cargo-leptos will hot-reload this stylesheet 
-        <Stylesheet id="leptos" href="/style.css"/>
+        <Router>
+            // injects a stylesheet into the document <head>
+            // id=leptos means cargo-leptos will hot-reload this stylesheet
+            <Stylesheet id="leptos" href="/style.css"/>
 
-        // sets the document title
-        <Title text="Welcome to Leptos"/>
+            // sets the document title
+            <Title text="Welcome to Leptos"/>
 
-        // content for this welcome page
-        <main>            
-            <h1>"Welcome to Leptos!"</h1>
-            <button on:click=on_click>"Click Me: " {count}</button>
-        </main>
+            // content for this welcome page
+            <main>
+                <DarkModeToggle/>
+                <h1>"Welcome to Leptos!"</h1>
+                <button on:click=on_click>"Click Me: " {count}</button>
+            </main>
+        </Router>
     }
 }
