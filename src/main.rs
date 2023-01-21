@@ -10,7 +10,7 @@ cfg_if! {
 
         fn app(cx: leptos::Scope) -> impl IntoView {
             use darkmode::app::*;
-        
+
             view! { cx, <App /> }
         }
 
@@ -27,16 +27,13 @@ cfg_if! {
             HttpServer::new(move || {
                 let leptos_options = &conf.leptos_options;
                 let site_root = &leptos_options.site_root;
-                let pkg_dir = &leptos_options.site_pkg_dir;
-                let bundle_path = format!("/{site_root}/{pkg_dir}");
                 let routes = generate_route_list(app);
 
                 actix_web::App::new()
-                    // used by cargo-leptos. Can be removed if using wasm-pack and cargo run.
-                    .service(Files::new(&pkg_dir, format!("./{bundle_path}")))
                     .route("/api/{tail:.*}", handle_server_fns())
                     .leptos_routes(leptos_options.clone(), routes, app)
-                    //fallback (in this case used for assets)
+                    // used by cargo-leptos. Should handle static files another way if not using cargo-leptos.
+                    // fallback (for static files)
                     .service(Files::new("", format!("./{site_root}")))
                     .wrap(Compress::default())
             })
