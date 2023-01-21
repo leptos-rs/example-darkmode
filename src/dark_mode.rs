@@ -25,7 +25,7 @@ pub async fn toggle_dark_mode(cx: Scope, prefers_dark: bool) -> Result<bool, Ser
 }
 
 #[cfg(not(feature = "ssr"))]
-fn initial_prefers_dark(cx: Scope) -> bool {
+fn initial_prefers_dark(_cx: Scope) -> bool {
     let doc = document().unchecked_into::<web_sys::HtmlDocument>();
     let cookie = doc.cookie().unwrap_or_default();
     cookie.contains("darkmode=true")
@@ -33,15 +33,18 @@ fn initial_prefers_dark(cx: Scope) -> bool {
 
 #[cfg(feature = "ssr")]
 fn initial_prefers_dark(cx: Scope) -> bool {
-    let req = use_context::<actix_web::HttpRequest>(cx).expect("to have access to HttpRequest");
-    let cookies = req.cookies();
-    cookies
-        .map(|cookies| {
-            cookies
-                .iter()
-                .any(|cookie| cookie.name() == "darkmode" && cookie.value() == "true")
-        })
-        .unwrap_or(false)
+    if let Some(req) = use_context::<actix_web::HttpRequest>(cx) {
+        let cookies = req.cookies();
+        cookies
+            .map(|cookies| {
+                cookies
+                    .iter()
+                    .any(|cookie| cookie.name() == "darkmode" && cookie.value() == "true")
+            })
+            .unwrap_or(false)
+    } else {
+        false
+    }
 }
 
 #[component]
