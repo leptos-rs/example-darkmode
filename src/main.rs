@@ -3,9 +3,16 @@ use cfg_if::cfg_if;
 cfg_if! {
     if #[cfg(feature = "ssr")] {
         use leptos::*;
-        use actix_files::{Files, NamedFile};
+        use leptos_actix::*;
+        use actix_files::{Files};
         use actix_web::{HttpServer, middleware::Compress, web};
-        use darkmode::app::*;
+        use darkmode::app::register_server_functions;
+
+        fn app(cx: leptos::Scope) -> impl IntoView {
+            use darkmode::app::*;
+
+            view! { cx, <App /> }
+        }
 
         #[actix_web::main]
         async fn main() -> std::io::Result<()> {
@@ -20,22 +27,14 @@ cfg_if! {
             HttpServer::new(move || {
                 let leptos_options = &conf.leptos_options;
                 let site_root = &leptos_options.site_root;
-                let pkg_dir = &leptos_options.site_pkg_dir;
-                let bundle_path = format!("/{site_root}/{pkg_dir}");
-                let output_name = leptos_options.output_name.clone();
+                let routes = generate_route_list(app);
 
                 actix_web::App::new()
-                    // used by cargo-leptos. Can be removed if using wasm-pack and cargo run.
-                    .service(Files::new(&bundle_path, format!("./{bundle_path}")))
-                    .route("/style.css", web::get().to(move || {
-                        let bundle_path = bundle_path.clone();
-                        let output_name = output_name.clone();
-                        async move {
-                            NamedFile::open_async(format!("./{}/{}.css", bundle_path, output_name)).await.expect("could not open CSS file")
-                        }
-                    }))
-                    .route("/api/{tail:.*}", leptos_actix::handle_server_fns())
-                    .route("/{tail:.*}", leptos_actix::render_app_to_stream(leptos_options.to_owned(), |cx| view! { cx, <App/> }))
+                    .route("/api/{tail:.*}", handle_server_fns())
+                    .leptos_routes(leptos_options.clone(), routes, app)
+                    // used by cargo-leptos. Should handle static files another way if not using cargo-leptos.
+                    // fallback (for static files)
+                    .service(Files::new("", format!("./{site_root}")))
                     .wrap(Compress::default())
             })
             .bind(&addr)?
