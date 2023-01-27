@@ -5,7 +5,7 @@ cfg_if! {
         use leptos::*;
         use leptos_actix::*;
         use actix_files::{Files};
-        use actix_web::{HttpServer, middleware::Compress, web};
+        use actix_web::{HttpServer, middleware::Compress};
         use darkmode::app::register_server_functions;
 
         fn app(cx: leptos::Scope) -> impl IntoView {
@@ -17,7 +17,7 @@ cfg_if! {
         #[actix_web::main]
         async fn main() -> std::io::Result<()> {
             let conf = get_configuration(Some("Cargo.toml")).await.unwrap();
-            let addr = conf.leptos_options.site_address.clone();
+            let addr = conf.leptos_options.site_address;
 
             simple_logger::init_with_level(log::Level::Debug).expect("couldn't initialize logging");
             log::info!("serving at http://{addr}");
