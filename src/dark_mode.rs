@@ -20,7 +20,7 @@ pub async fn toggle_dark_mode(cx: Scope, prefers_dark: bool) -> Result<bool, Ser
 
     std::thread::sleep(std::time::Duration::from_millis(250));
 
-    response.overwrite(response_parts).await;
+    response.overwrite(response_parts);
     Ok(prefers_dark)
 }
 
