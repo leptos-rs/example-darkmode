@@ -17,7 +17,7 @@ cfg_if! {
         #[actix_web::main]
         async fn main() -> std::io::Result<()> {
             let conf = get_configuration(Some("Cargo.toml")).await.unwrap();
-            let addr = conf.leptos_options.site_address;
+            let addr = conf.leptos_options.site_addr;
 
             simple_logger::init_with_level(log::Level::Debug).expect("couldn't initialize logging");
             log::info!("serving at http://{addr}");
